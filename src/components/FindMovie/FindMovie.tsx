@@ -24,7 +24,7 @@ export const FindMovie: React.FC<Props> = ({ movies, setMovies }) => {
       title: data.Title,
       description: data.Plot,
       imgUrl: data.Poster === 'N/A' ? '' : data.Poster,
-      imdbUrl: `https://www.imdb.com/title/${data.imdbID}/`,
+      imdbUrl: `https://www.imdb.com/title/${data.imdbID}`,
       imdbId: data.imdbID,
     };
   };

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { Movie } from '../../types/Movie';
 import { MovieCard } from '../MovieCard';
 import { getMovie } from '../../api';
+import { MovieData } from '../../types/MovieData';
 
 type Props = {
   movies: Movie[];
@@ -18,6 +19,16 @@ export const FindMovie: React.FC<Props> = ({ movies, setMovies }) => {
   const [isPreviewShown, setIsPreviewShown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const normalizeMovie = (data: MovieData): Movie => {
+    return {
+      title: data.Title,
+      description: data.Plot,
+      imgUrl: data.Poster === 'N/A' ? '' : data.Poster,
+      imdbUrl: `https://www.imdb.com/title/${data.imdbID}/`,
+      imdbId: data.imdbID,
+    };
+  };
+
   async function handlerSearchMovie(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
@@ -26,7 +37,7 @@ export const FindMovie: React.FC<Props> = ({ movies, setMovies }) => {
       const fetchedMovie = await getMovie(query);
 
       if (fetchedMovie && fetchedMovie.Response !== 'False') {
-        setFoundMovie(fetchedMovie);
+        setFoundMovie(normalizeMovie(fetchedMovie as MovieData));
         setIsPreviewShown(true);
       } else {
         setHasFoundError(true);
@@ -39,10 +50,11 @@ export const FindMovie: React.FC<Props> = ({ movies, setMovies }) => {
   function handlerChangeQuery(event: ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value);
     setHasFoundError(false);
+    setHasDuplicateError(false);
   }
 
   function handleAddMovie() {
-    if (movies.some(currMovie => currMovie.imdbID === foundMovie?.imdbID)) {
+    if (movies.some(currMovie => currMovie.imdbId === foundMovie?.imdbId)) {
       setQuery('');
       setIsPreviewShown(false);
       setFoundMovie(null);
